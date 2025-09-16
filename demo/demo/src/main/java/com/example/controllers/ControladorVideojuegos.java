@@ -2,17 +2,19 @@ package com.example.controllers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.interfaces.ManejoDeFechas;
 import com.example.models.Videojuego;
 
 @Controller
-// http://localhost:8080/getAll
+// http://localhost:8080/
 @RequestMapping("/")
 public class ControladorVideojuegos implements ManejoDeFechas {
 
@@ -45,5 +47,68 @@ public class ControladorVideojuegos implements ManejoDeFechas {
     public String getVideojuegos(Model modelo) {
         modelo.addAttribute("videojuegos", this.videojuegos);
         return "videojuegos.jsp";
+    }
+
+    // Query String
+    // http://localhost:8080/get?id=4
+    @GetMapping("/get")
+    public String getByName1(@RequestParam(value = "id") Long id, Model modelo) {
+        Videojuego v = buscar(id);
+        if (v != null) {
+            modelo.addAttribute("videojuego", v);
+            return "detalle.jsp";
+        } else {
+            return "redirect:/getAll";
+        }
+    }
+
+    // Path Variables
+    // http://localhost:8080/get/4
+    @GetMapping("/get/{id}")
+    public String getByName2(@PathVariable("id") Long id, Model modelo) {
+        Videojuego v = buscar(id);
+        if (v != null) {
+            modelo.addAttribute("videojuego", v);
+            return "detalle.jsp";
+        } else {
+            return "redirect:/getAll";
+        }
+    }
+
+    private Videojuego buscar(Long id) {
+        Videojuego v = null;
+        for (int i = 0; i < videojuegos.size(); i++) {
+            if (videojuegos.get(i).getId().equals(id)) {
+                v = videojuegos.get(i);
+            }
+        }
+        return v;
+    }
+
+    @GetMapping("/form/add")
+    public String formAgregar() {
+        return "agregar.jsp";
+    }
+
+    @PostMapping("/add")
+    public String guardar(@RequestParam String nombre,
+            @RequestParam String descripcion,
+            @RequestParam String portada,
+            @RequestParam String fecha_lanzamiento,
+            @RequestParam String rating,
+            @RequestParam String generos,
+            @RequestParam String plataformas) {
+
+        long id = this.videojuegos.size() + 1;
+        Videojuego v = new Videojuego(id,
+                nombre,
+                descripcion,
+                portada,
+                formatearFecha(fecha_lanzamiento),
+                Double.parseDouble(rating),
+                new ArrayList<String>(Arrays.asList(generos)),
+                new ArrayList<String>(Arrays.asList(plataformas)));
+        this.videojuegos.add(v);
+        return "redirect:/getAll";
     }
 }
