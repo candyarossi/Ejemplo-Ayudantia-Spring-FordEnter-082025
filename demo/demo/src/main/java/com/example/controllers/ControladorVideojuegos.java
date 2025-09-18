@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import com.example.interfaces.ManejoDeFechas;
 import com.example.models.Videojuego;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 // http://localhost:8080/
 @RequestMapping("/")
@@ -43,35 +45,51 @@ public class ControladorVideojuegos implements ManejoDeFechas {
         this.videojuegos.add(v3);
     }
 
+    // http://localhost:8080/getAll
     @GetMapping("/getAll")
-    public String getVideojuegos(Model modelo) {
-        modelo.addAttribute("videojuegos", this.videojuegos);
-        return "videojuegos.jsp";
+    public String getVideojuegos(Model modelo, HttpSession sesion) {
+        Long idUsuario = (Long) sesion.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/";
+        } else {
+            modelo.addAttribute("videojuegos", this.videojuegos);
+            return "videojuegos.jsp";
+        }
     }
 
     // Query String
     // http://localhost:8080/get?id=4
     @GetMapping("/get")
-    public String getByName1(@RequestParam(value = "id") Long id, Model modelo) {
-        Videojuego v = buscar(id);
-        if (v != null) {
-            modelo.addAttribute("videojuego", v);
-            return "detalle.jsp";
+    public String getByName1(@RequestParam(value = "id") Long id, Model modelo, HttpSession sesion) {
+        Long idUsuario = (Long) sesion.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/";
         } else {
-            return "redirect:/getAll";
+            Videojuego v = buscar(id);
+            if (v != null) {
+                modelo.addAttribute("videojuego", v);
+                return "detalle.jsp";
+            } else {
+                return "redirect:/getAll";
+            }
         }
     }
 
     // Path Variables
     // http://localhost:8080/get/4
     @GetMapping("/get/{id}")
-    public String getByName2(@PathVariable("id") Long id, Model modelo) {
-        Videojuego v = buscar(id);
-        if (v != null) {
-            modelo.addAttribute("videojuego", v);
-            return "detalle.jsp";
+    public String getByName2(@PathVariable("id") Long id, Model modelo, HttpSession sesion) {
+        Long idUsuario = (Long) sesion.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/";
         } else {
-            return "redirect:/getAll";
+            Videojuego v = buscar(id);
+            if (v != null) {
+                modelo.addAttribute("videojuego", v);
+                return "detalle.jsp";
+            } else {
+                return "redirect:/getAll";
+            }
         }
     }
 
@@ -85,11 +103,18 @@ public class ControladorVideojuegos implements ManejoDeFechas {
         return v;
     }
 
+    // http://localhost:8080/form/add
     @GetMapping("/form/add")
-    public String formAgregar() {
-        return "agregar.jsp";
+    public String formAgregar(HttpSession sesion) {
+        Long idUsuario = (Long) sesion.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/";
+        } else {
+            return "agregar.jsp";
+        }
     }
 
+    // http://localhost:8080/add
     @PostMapping("/add")
     public String guardar(@RequestParam String nombre,
             @RequestParam String descripcion,
@@ -97,18 +122,23 @@ public class ControladorVideojuegos implements ManejoDeFechas {
             @RequestParam String fecha_lanzamiento,
             @RequestParam String rating,
             @RequestParam String generos,
-            @RequestParam String plataformas) {
-
-        long id = this.videojuegos.size() + 1;
-        Videojuego v = new Videojuego(id,
-                nombre,
-                descripcion,
-                portada,
-                formatearFecha(fecha_lanzamiento),
-                Double.parseDouble(rating),
-                new ArrayList<String>(Arrays.asList(generos)),
-                new ArrayList<String>(Arrays.asList(plataformas)));
-        this.videojuegos.add(v);
-        return "redirect:/getAll";
+            @RequestParam String plataformas,
+            HttpSession sesion) {
+        Long idUsuario = (Long) sesion.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/";
+        } else {
+            long id = this.videojuegos.size() + 1;
+            Videojuego v = new Videojuego(id,
+                    nombre,
+                    descripcion,
+                    portada,
+                    formatearFecha(fecha_lanzamiento),
+                    Double.parseDouble(rating),
+                    new ArrayList<String>(Arrays.asList(generos)),
+                    new ArrayList<String>(Arrays.asList(plataformas)));
+            this.videojuegos.add(v);
+            return "redirect:/getAll";
+        }
     }
 }

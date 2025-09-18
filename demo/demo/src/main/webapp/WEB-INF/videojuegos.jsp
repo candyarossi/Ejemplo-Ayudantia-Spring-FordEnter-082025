@@ -9,7 +9,10 @@
 </head>
 <body>
     <div class="nav">
+		<h3>&iexcl;Bienvenido ${nombreUsuario}&excl;</h3>
+		<h3 class="precio" id="coins">$${coinsUsuario}</h3>
 		<a href="/form/add">Crear Juego</a>
+		<a href="/logout">Salir</a>
 	</div>
 	<div class="content">
 	    <div class="vComunidad">
