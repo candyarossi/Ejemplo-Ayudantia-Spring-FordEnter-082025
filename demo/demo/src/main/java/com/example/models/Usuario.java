@@ -30,6 +30,9 @@ public class Usuario {
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 200.00")
     private Double coins;
 
+    public Usuario(){
+    }
+
     public Usuario(String nombre, String apellido, String email, String password) {
         this.nombre = nombre;
         this.apellido = apellido;

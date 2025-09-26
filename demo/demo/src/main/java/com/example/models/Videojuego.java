@@ -3,9 +3,7 @@ package com.example.models;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
-
 import org.hibernate.validator.constraints.URL;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
