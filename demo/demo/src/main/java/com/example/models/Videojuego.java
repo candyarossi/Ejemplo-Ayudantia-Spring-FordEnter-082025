@@ -2,14 +2,20 @@ package com.example.models;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import org.hibernate.validator.constraints.URL;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -44,6 +50,15 @@ public class Videojuego {
 
     // private ArrayList<String> generos;
     // private ArrayList<String> plataformas;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario creador;
+
+    @ManyToMany
+    @JoinTable(name = "usuarios_videojuegos", joinColumns = @JoinColumn(name = "id_videojuego"), inverseJoinColumns = @JoinColumn(name = "id_usuario"))
+    @Transient
+    private List<Usuario> compradores;
 
     public Videojuego() {
     }
@@ -151,4 +166,21 @@ public class Videojuego {
     public void setPrecioRandom() {
         this.precio = this.generarPrecioRandom();
     }
+
+    public Usuario getCreador() {
+        return creador;
+    }
+
+    public void setCreador(Usuario creador) {
+        this.creador = creador;
+    }
+
+    public List<Usuario> getCompradores() {
+        return compradores;
+    }
+
+    public void setCompradores(List<Usuario> compradores) {
+        this.compradores = compradores;
+    }
+
 }

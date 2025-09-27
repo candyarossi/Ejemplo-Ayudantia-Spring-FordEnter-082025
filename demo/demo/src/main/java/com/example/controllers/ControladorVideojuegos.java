@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.interfaces.ManejoDeFechas;
+import com.example.models.Usuario;
 import com.example.models.Videojuego;
+import com.example.services.ServicioUsuarios;
 import com.example.services.ServicioVideojuegos;
 
 import jakarta.servlet.http.HttpSession;
@@ -29,6 +32,9 @@ public class ControladorVideojuegos implements ManejoDeFechas {
 
     @Autowired
     private ServicioVideojuegos servicioVideojuegos;
+
+    @Autowired
+    private ServicioUsuarios servicioUsuarios;
 
     public ControladorVideojuegos() {
         /*
@@ -70,6 +76,15 @@ public class ControladorVideojuegos implements ManejoDeFechas {
             return "redirect:/";
         } else {
             List<Videojuego> videojuegos = servicioVideojuegos.obtenerTodosLosVideojuegos();
+            List<Videojuego> misVideojuegosCreados = servicioUsuarios.obtenerUsuarioPorId(idUsuario)
+                    .getMisVideojuegos();
+            List<Videojuego> misVideojuegosComprados = servicioUsuarios.obtenerUsuarioPorId(idUsuario).getComprados();
+            List<Videojuego> misVideojuegos = new ArrayList<>();
+            if (misVideojuegosCreados != null)
+                misVideojuegos.addAll(misVideojuegosCreados);
+            if (misVideojuegosComprados != null)
+                misVideojuegos.addAll(misVideojuegosComprados);
+            modelo.addAttribute("misVideojuegos", misVideojuegos);
             modelo.addAttribute("videojuegos", videojuegos);
             return "videojuegos.jsp";
         }
@@ -148,6 +163,31 @@ public class ControladorVideojuegos implements ManejoDeFechas {
                 return "agregar.jsp";
             }
             servicioVideojuegos.crear(videojuego);
+            return "redirect:/getAll";
+        }
+    }
+
+    // http://localhost:8080/buy/4
+    @GetMapping("/buy/{id}")
+    public String comprar(@PathVariable("id") Long idJuego, Model modelo, HttpSession sesion) {
+        Long idUsuario = (Long) sesion.getAttribute("idUsuario");
+        if (idUsuario == null) {
+            return "redirect:/";
+        } else {
+            Usuario user = servicioUsuarios.obtenerUsuarioPorId(idUsuario);
+            Videojuego videojuego = servicioVideojuegos.obtenerPorId(idJuego);
+
+            List<Videojuego> juegosUser = user.getComprados();
+            juegosUser.add(videojuego);
+            user.setComprados(juegosUser);
+
+            Double coinsUser = user.getCoins();
+            Double resto = coinsUser - videojuego.getPrecio();
+            user.setCoins(resto);
+            sesion.setAttribute("coinsUsuario", resto);
+
+            servicioUsuarios.actualizarUsuario(user);
+
             return "redirect:/getAll";
         }
     }

@@ -1,10 +1,16 @@
 package com.example.models;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -30,7 +36,14 @@ public class Usuario {
     @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 200.00")
     private Double coins;
 
-    public Usuario(){
+    @OneToMany(mappedBy = "creador")
+    private List<Videojuego> misVideojuegos;
+
+    @ManyToMany
+    @JoinTable(name = "usuarios_videojuegos", joinColumns = @JoinColumn(name = "id_usuario"), inverseJoinColumns = @JoinColumn(name = "id_videojuego"))
+    private List<Videojuego> comprados;
+
+    public Usuario() {
     }
 
     public Usuario(String nombre, String apellido, String email, String password) {
@@ -94,4 +107,21 @@ public class Usuario {
         return "Usuario [id=" + id + ", nombre=" + nombre + ", apellido=" + apellido + ", email=" + email
                 + ", password=" + password + ", coins=" + coins + "]";
     }
+
+    public List<Videojuego> getMisVideojuegos() {
+        return misVideojuegos;
+    }
+
+    public void setMisVideojuegos(List<Videojuego> misVideojuegos) {
+        this.misVideojuegos = misVideojuegos;
+    }
+
+    public List<Videojuego> getComprados() {
+        return comprados;
+    }
+
+    public void setComprados(List<Videojuego> comprados) {
+        this.comprados = comprados;
+    }
+
 }

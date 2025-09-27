@@ -37,6 +37,7 @@
 				</c:forEach>
 			</ol>
 		</li>--%>
+		<li>Creador: <b>${videojuego.creador.nombre} ${videojuego.creador.apellido}</b></li>
 	</ul>
 	</div>
 	</div>

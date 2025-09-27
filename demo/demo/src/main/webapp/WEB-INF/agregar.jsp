@@ -49,6 +49,8 @@
 		</form:select>
 		<form:errors path="plataformas"/>--%>
 
+		<input type="hidden" value="${idUsuario}" name="creador" />
+
 		<input type="submit" value="Crear Juego"/>
 	</form:form>
 	<a href="/getAll">Volver</a>
